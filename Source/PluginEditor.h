@@ -23,6 +23,7 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    void setSliderParams(juce::Slider& slider, juce::Label& label, juce::String name);
 
 private:
     juce::Slider attackSlider;
@@ -30,6 +31,11 @@ private:
     juce::Slider sustainSlider;
     juce::Slider releaseSlider;
     juce::ComboBox oscSelector;
+
+    juce::Label attackLabel;
+    juce::Label decayLabel;
+    juce::Label sustainLabel;
+    juce::Label releaseLabel;
 
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     std::unique_ptr<SliderAttachment> attackAttachment;
