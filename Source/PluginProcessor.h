@@ -9,6 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "SynthVoice.h"
+#include "SynthSound.h"
 
 //==============================================================================
 /**
@@ -54,6 +56,8 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    juce::Synthesiser synth;
+
     juce::dsp::Oscillator<float> sine{ [](float x) { return std::sin(x); }, 200 }; // Sine Wave Osc
     juce::dsp::Oscillator<float> saw{ [](float x) { return x / juce::MathConstants<float>::pi; }, 200 }; // Saw Wave Osc
     juce::dsp::Oscillator<float> square{ [](float x) { return x < 0.0f ? -1.0f : 1.0f; }, 200 }; // Square Wave Osc

@@ -8,6 +8,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "SynthVoice.h"
+#include "SynthSound.h"
 
 //==============================================================================
 Music167AudioProcessor::Music167AudioProcessor()
@@ -22,6 +24,8 @@ Music167AudioProcessor::Music167AudioProcessor()
                        )
 #endif
 {
+    synth.addSound(new SynthSound());
+    synth.addVoice(new SynthVoice());
 }
 
 Music167AudioProcessor::~Music167AudioProcessor()
@@ -105,6 +109,8 @@ void Music167AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
     osc.setFrequency(220.0);
     gain.setGainLinear(0.01f);
+
+    synth.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void Music167AudioProcessor::releaseResources()
@@ -157,6 +163,18 @@ void Music167AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     juce::dsp::AudioBlock<float> audioBlock{ buffer };
     osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
     gain.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
+
+    // Check that voices exist
+    for (int i = 0; i < synth.getNumVoices(); ++i) {
+        if (auto voice = dynamic_cast<juce::SynthesiserVoice*>(synth.getVoice(i))) {
+            // Osc controls
+            // ADSR
+            // LFO
+        }
+    }
+
+    // Render
+    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
 //==============================================================================
