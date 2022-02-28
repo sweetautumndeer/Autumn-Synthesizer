@@ -12,6 +12,8 @@
 
 #include <JuceHeader.h>
 #include "SynthSound.h"
+#include "Data/AdsrData.h"
+#include "Data/OscData.h"
 
 class SynthVoice : public juce::SynthesiserVoice {
 public:
@@ -21,20 +23,16 @@ public:
     virtual void stopNote(float velocity, bool allowTailOff) override;
     virtual void pitchWheelMoved(int newPitchWheelValue) override;
     virtual void controllerMoved(int controllerNumber, int newControllerValue) override;
-    void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void updateADSR(const float attack, const float decay, const float sustain, const float release);
+    void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     virtual void renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
+    OscData& getOscillator() { return osc; };
 
 private:
-    juce::dsp::Oscillator<float> sine{ [](float x) { return std::sin(x); }, 200 }; // Sine Wave Osc
-    juce::dsp::Oscillator<float> saw{ [](float x) { return x / juce::MathConstants<float>::pi; }, 200 }; // Saw Wave Osc
-    juce::dsp::Oscillator<float> square{ [](float x) { return x < 0.0f ? -1.0f : 1.0f; }, 200 }; // Square Wave Osc
-
-    juce::dsp::Oscillator<float> osc{ [](float x) { return x / juce::MathConstants<float>::pi; }, 200 };
+    OscData osc;
     juce::dsp::Gain<float> gain; // Output Volume
+    AdsrData adsr;
 
-    juce::ADSR adsr;
-    juce::ADSR::Parameters adsrParams;
-
+    juce::AudioBuffer<float> synthBuffer;
     bool isPrepared{ false };
 };

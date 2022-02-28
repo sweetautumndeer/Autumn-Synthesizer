@@ -2,6 +2,12 @@
 
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Music167\Source\Data">
+      <UniqueIdentifier>{ED9AD5A7-90D7-413D-A4C4-D8F01B51939A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Music167\Source\UI">
+      <UniqueIdentifier>{94B92E02-2F34-FBDE-8B35-E6DC9757F23B}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Music167\Source">
       <UniqueIdentifier>{B0CC5AEF-0C8D-8824-4EE5-FE85D8A49D08}</UniqueIdentifier>
     </Filter>
@@ -477,6 +483,18 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\SynthVoice.cpp">
       <Filter>Music167\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Data\AdsrData.cpp">
+      <Filter>Music167\Source\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Data\OscData.cpp">
+      <Filter>Music167\Source\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\UI\AdsrComponent.cpp">
+      <Filter>Music167\Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\UI\OscComponent.cpp">
+      <Filter>Music167\Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
       <Filter>JUCE Modules\juce_audio_basics\buffers</Filter>
@@ -2714,6 +2732,18 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\SynthSound.h">
       <Filter>Music167\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Data\AdsrData.h">
+      <Filter>Music167\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Data\OscData.h">
+      <Filter>Music167\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\UI\AdsrComponent.h">
+      <Filter>Music167\Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\UI\OscComponent.h">
+      <Filter>Music167\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h">
       <Filter>JUCE Modules\juce_audio_basics\audio_play_head</Filter>

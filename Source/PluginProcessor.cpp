@@ -166,7 +166,10 @@ void Music167AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             auto& sustain = *apvts.getRawParameterValue("SUSTAIN");
             auto& release = *apvts.getRawParameterValue("RELEASE");
 
+            auto& oscWave = *apvts.getRawParameterValue("OSC1WAVETYPE");
+
             voice->updateADSR(attack.load(), decay.load(), sustain.load(), release.load());
+            voice->getOscillator().setWaveType(oscWave);
             // LFO
         }
     }
@@ -217,6 +220,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout Music167AudioProcessor::crea
     params.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", juce::NormalisableRange<float>{ 0.1f, 1.0f, }, 0.1f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", juce::NormalisableRange<float>{ 0.0f, 1.0f, }, 1.0f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", juce::NormalisableRange<float>{ 0.0f, 3.0f, }, 0.4f));
+
+    // Osc wave selection
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC1WAVETYPE", "Osc 1 Wave Type", juce::StringArray { "Sine", "Triangle", "Saw", "Square" }, 0));
 
     return{ params.begin(), params.end() };
 }

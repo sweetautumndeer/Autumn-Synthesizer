@@ -16,12 +16,15 @@ bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound) {
 }
 
 void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) {
-    osc.setFrequency(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber));
+    osc.setWaveFrequency(midiNoteNumber);
     adsr.noteOn();
 }
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff) {
     adsr.noteOff();
+    
+    if (!allowTailOff || !adsr.isActive())
+        clearCurrentNote();
 }
 
 void SynthVoice::pitchWheelMoved(int newPitchWheelValue) {
@@ -38,7 +41,7 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     spec.sampleRate = sampleRate;
     spec.numChannels = outputChannels;
 
-    osc.prepare(spec);
+    osc.prepareToPlay(spec);
     gain.prepare(spec);
 
     gain.setGainLinear(0.3f);
@@ -47,19 +50,29 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
 }
 
 void SynthVoice::updateADSR(const float attack, const float decay, const float sustain, const float release) {
-    adsrParams.attack = attack;
-    adsrParams.decay = decay;
-    adsrParams.sustain = sustain;
-    adsrParams.release = release;
-    adsr.setParameters(adsrParams);
+    adsr.updateADSR(attack, decay, sustain, release);
 }
 
 void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) {
+    // Check if voice has prepared to play and is not silent, otherwise 
     jassert(isPrepared);
+    if (!isVoiceActive())
+        return;
 
-    juce::dsp::AudioBlock<float> audioBlock{ outputBuffer };
-    osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
+    // Set up temp buffer
+    synthBuffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
+    synthBuffer.clear();
+
+    // Apply information to temp buffer
+    juce::dsp::AudioBlock<float> audioBlock{ synthBuffer };
+    osc.getNextAudioBlock(audioBlock);
     gain.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
+    adsr.applyEnvelopeToBuffer(synthBuffer, 0, synthBuffer.getNumSamples());
 
-    adsr.applyEnvelopeToBuffer(outputBuffer, startSample, numSamples);
+    // Add to output channel by channel
+    for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel) {
+        outputBuffer.addFrom(channel, startSample, synthBuffer, channel, 0, numSamples);
+        if (!adsr.isActive())
+            clearCurrentNote();
+    }
 }

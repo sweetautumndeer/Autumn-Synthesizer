@@ -15,6 +15,20 @@
       <FILE id="GrDJbW" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
       <FILE id="NAnmFs" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
       <FILE id="KQQ7m4" name="SynthSound.h" compile="0" resource="0" file="Source/SynthSound.h"/>
+      <GROUP id="{82215B38-884F-27F8-C007-7E51832B18CD}" name="Data">
+        <FILE id="g6D1zW" name="AdsrData.cpp" compile="1" resource="0" file="Source/Data/AdsrData.cpp"/>
+        <FILE id="HzttS5" name="AdsrData.h" compile="0" resource="0" file="Source/Data/AdsrData.h"/>
+        <FILE id="REwiHg" name="OscData.cpp" compile="1" resource="0" file="Source/Data/OscData.cpp"/>
+        <FILE id="w55CsD" name="OscData.h" compile="0" resource="0" file="Source/Data/OscData.h"/>
+      </GROUP>
+      <GROUP id="{BBEA76CD-0734-2C48-9922-7B66654B2AE2}" name="UI">
+        <FILE id="LIQunF" name="AdsrComponent.cpp" compile="1" resource="0"
+              file="Source/UI/AdsrComponent.cpp"/>
+        <FILE id="SE1VxA" name="AdsrComponent.h" compile="0" resource="0" file="Source/UI/AdsrComponent.h"/>
+        <FILE id="GetEB6" name="OscComponent.cpp" compile="1" resource="0"
+              file="Source/UI/OscComponent.cpp"/>
+        <FILE id="vODWjf" name="OscComponent.h" compile="0" resource="0" file="Source/UI/OscComponent.h"/>
+      </GROUP>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
