@@ -11,6 +11,8 @@
 #include "SynthVoice.h"
 #include "SynthSound.h"
 
+constexpr int NUMVOICES = 15; // max polyphony voices
+
 //==============================================================================
 Music167AudioProcessor::Music167AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -25,7 +27,8 @@ Music167AudioProcessor::Music167AudioProcessor()
 #endif
 {
     synth.addSound(new SynthSound());
-    synth.addVoice(new SynthVoice());
+    for (int i = 0; i < NUMVOICES; ++i)
+        synth.addVoice(new SynthVoice());
 }
 
 Music167AudioProcessor::~Music167AudioProcessor()
@@ -107,6 +110,9 @@ void Music167AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
         if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
             voice->prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
     }
+
+    // Prepare filter
+    filter.prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
 }
 
 void Music167AudioProcessor::releaseResources()
@@ -160,22 +166,29 @@ void Music167AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (int i = 0; i < synth.getNumVoices(); ++i) {
         if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i))) {
             // Osc controls
+            auto& oscWave = *apvts.getRawParameterValue("OSC1WAVETYPE");
+            voice->getOscillator().setWaveType(oscWave);
+
             // ADSR
             auto& attack = *apvts.getRawParameterValue("ATTACK");
             auto& decay = *apvts.getRawParameterValue("DECAY");
             auto& sustain = *apvts.getRawParameterValue("SUSTAIN");
             auto& release = *apvts.getRawParameterValue("RELEASE");
-
-            auto& oscWave = *apvts.getRawParameterValue("OSC1WAVETYPE");
-
             voice->updateADSR(attack.load(), decay.load(), sustain.load(), release.load());
-            voice->getOscillator().setWaveType(oscWave);
+            
             // LFO
         }
     }
 
     // Render
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    // Filter
+    auto& filterType = *apvts.getRawParameterValue("FILTER1TYPE");
+    auto& cutoffFreq = *apvts.getRawParameterValue("FILTER1CUTOFF");
+    auto& resonance = *apvts.getRawParameterValue("FILTER1RESONANCE");
+    filter.updateParameters(filterType, cutoffFreq, resonance);
+    filter.process(buffer);
 }
 
 //==============================================================================
@@ -213,16 +226,20 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 juce::AudioProcessorValueTreeState::ParameterLayout Music167AudioProcessor::createParams() {
     // OSC wave selection
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC", "Oscillator", juce::StringArray{ "Sine", "Saw", "Square" }, 0));
 
     // ADSR parameters
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", juce::NormalisableRange<float>{ 0.01f, 1.0f, }, 0.01f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", juce::NormalisableRange<float>{ 0.1f, 1.0f, }, 0.1f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", juce::NormalisableRange<float>{ 0.0f, 1.0f, }, 1.0f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", juce::NormalisableRange<float>{ 0.0f, 3.0f, }, 0.4f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", juce::NormalisableRange<float>{ 0.01f, 1.0f, 0.01f }, 0.01f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", juce::NormalisableRange<float>{ 0.1f, 1.0f, 0.01f }, 0.1f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", juce::NormalisableRange<float>{ 0.0f, 1.0f, 0.01f }, 1.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", juce::NormalisableRange<float>{ 0.0f, 3.0f, 0.01f }, 0.4f));
 
     // Osc wave selection
     params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC1WAVETYPE", "Osc 1 Wave Type", juce::StringArray { "Sine", "Triangle", "Saw", "Square" }, 0));
+
+    // Filter parameters
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("FILTER1TYPE", "Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER1CUTOFF", "Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER1RESONANCE", "Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));
 
     return{ params.begin(), params.end() };
 }

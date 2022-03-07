@@ -11,13 +11,14 @@
 
 //==============================================================================
 Music167AudioProcessorEditor::Music167AudioProcessorEditor (Music167AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), adsr (audioProcessor.apvts), osc (audioProcessor.apvts, "OSC1WAVETYPE") {
+    : AudioProcessorEditor (&p), audioProcessor (p), adsr (audioProcessor.apvts), osc (audioProcessor.apvts, "OSC1WAVETYPE"), filter (audioProcessor.apvts, "FILTER1") {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
 
     addAndMakeVisible(adsr);
     addAndMakeVisible(osc);
+    addAndMakeVisible(filter);
 }
 
 Music167AudioProcessorEditor::~Music167AudioProcessorEditor() {
@@ -36,6 +37,7 @@ void Music167AudioProcessorEditor::paint (juce::Graphics& g) {
 void Music167AudioProcessorEditor::resized() {
     adsr.setBounds(getLocalBounds());
     osc.setBounds(10, 10, 100, 30);
+    filter.setBounds(10, 125, 350, 100);
 }
 
 

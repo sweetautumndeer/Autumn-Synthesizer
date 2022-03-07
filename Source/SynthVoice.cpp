@@ -64,7 +64,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
     synthBuffer.clear();
 
     // Apply information to temp buffer
-    juce::dsp::AudioBlock<float> audioBlock{ synthBuffer };
+    juce::dsp::AudioBlock<float> audioBlock { synthBuffer };
     osc.getNextAudioBlock(audioBlock);
     gain.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
     adsr.applyEnvelopeToBuffer(synthBuffer, 0, synthBuffer.getNumSamples());

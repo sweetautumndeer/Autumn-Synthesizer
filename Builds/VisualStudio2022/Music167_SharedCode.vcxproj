@@ -141,8 +141,10 @@
     <ClCompile Include="..\..\Source\PluginEditor.cpp"/>
     <ClCompile Include="..\..\Source\SynthVoice.cpp"/>
     <ClCompile Include="..\..\Source\Data\AdsrData.cpp"/>
+    <ClCompile Include="..\..\Source\Data\FilterData.cpp"/>
     <ClCompile Include="..\..\Source\Data\OscData.cpp"/>
     <ClCompile Include="..\..\Source\UI\AdsrComponent.cpp"/>
+    <ClCompile Include="..\..\Source\UI\FilterComponent.cpp"/>
     <ClCompile Include="..\..\Source\UI\OscComponent.cpp"/>
     <ClCompile Include="..\..\..\..\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -2221,8 +2223,10 @@
     <ClInclude Include="..\..\Source\SynthVoice.h"/>
     <ClInclude Include="..\..\Source\SynthSound.h"/>
     <ClInclude Include="..\..\Source\Data\AdsrData.h"/>
+    <ClInclude Include="..\..\Source\Data\FilterData.h"/>
     <ClInclude Include="..\..\Source\Data\OscData.h"/>
     <ClInclude Include="..\..\Source\UI\AdsrComponent.h"/>
+    <ClInclude Include="..\..\Source\UI\FilterComponent.h"/>
     <ClInclude Include="..\..\Source\UI\OscComponent.h"/>
     <ClInclude Include="..\..\..\..\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h"/>
     <ClInclude Include="..\..\..\..\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h"/>
