@@ -29,7 +29,7 @@ AdsrComponent::~AdsrComponent() {
 }
 
 void AdsrComponent::setSliderParams(juce::Slider& slider, juce::Label& label, juce::String name) {
-    slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     slider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 160, slider.getTextBoxHeight());
     slider.setTextValueSuffix(" sec");
     addAndMakeVisible(slider);
@@ -45,11 +45,12 @@ void AdsrComponent::paint (juce::Graphics& g) {
 
 void AdsrComponent::resized() {
     const auto bounds = getLocalBounds().reduced(10); // get plugin bounds with margin
-    const auto padding = 10;
+    const auto padding = bounds.getWidth() / 40;
+    const auto textPadding = bounds.getHeight() / 10;
     const auto sliderWidth = bounds.getWidth() / 4 - padding;
     const auto sliderHeight = bounds.getWidth() / 4 - padding;
     const auto sliderStartX = padding;
-    const auto sliderStartY = bounds.getHeight() / 2 - (sliderHeight);
+    const auto sliderStartY = bounds.getHeight() / 2 - (sliderHeight) + textPadding;
 
     attackSlider.setBounds(sliderStartX, sliderStartY, sliderWidth, sliderHeight);
     decaySlider.setBounds(attackSlider.getRight() + padding, sliderStartY, sliderWidth, sliderHeight);

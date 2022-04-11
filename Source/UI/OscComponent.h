@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "FilterComponent.h"
 
 //==============================================================================
 /*
@@ -27,6 +28,8 @@ public:
 private:
     juce::ComboBox oscWaveSelector;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> oscWaveSelectorAttachment;
+    FilterComponent oscFilter;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscComponent)
 };

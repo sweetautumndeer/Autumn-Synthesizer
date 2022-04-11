@@ -184,9 +184,9 @@ void Music167AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     // Filter
-    auto& filterType = *apvts.getRawParameterValue("FILTER1TYPE");
-    auto& cutoffFreq = *apvts.getRawParameterValue("FILTER1CUTOFF");
-    auto& resonance = *apvts.getRawParameterValue("FILTER1RESONANCE");
+    auto& filterType = *apvts.getRawParameterValue("MASTERFILTERTYPE");
+    auto& cutoffFreq = *apvts.getRawParameterValue("MASTERFILTERCUTOFF");
+    auto& resonance = *apvts.getRawParameterValue("MASTERFILTERRESONANCE");
     filter.updateParameters(filterType, cutoffFreq, resonance);
     filter.process(buffer);
 }
@@ -244,11 +244,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout Music167AudioProcessor::crea
 
     // Osc wave selection
     params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC1WAVETYPE", "Osc 1 Wave Type", juce::StringArray { "Sine", "Triangle", "Saw", "Square" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC2WAVETYPE", "Osc 2 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC3WAVETYPE", "Osc 3 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
 
     // Filter parameters
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("FILTER1TYPE", "Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER1CUTOFF", "Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER1RESONANCE", "Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("MASTERFILTERTYPE", "Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("MASTERFILTERCUTOFF", "Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("MASTERFILTERRESONANCE", "Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));
 
     return{ params.begin(), params.end() };
 }

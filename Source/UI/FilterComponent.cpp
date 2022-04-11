@@ -33,7 +33,8 @@ FilterComponent::~FilterComponent()
 {
 }
 
-void FilterComponent::setSliderParams(juce::Slider& slider, juce::Label& label, juce::String name) {
+void FilterComponent::setSliderParams(juce::Slider& slider, juce::Label& label, juce::String name) 
+{
     slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     slider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 160, slider.getTextBoxHeight());
     slider.setTextValueSuffix(" sec");
@@ -44,16 +45,25 @@ void FilterComponent::setSliderParams(juce::Slider& slider, juce::Label& label, 
     addAndMakeVisible(label);
 }
 
-void FilterComponent::paint (juce::Graphics& g) {
+void FilterComponent::paint (juce::Graphics& g) 
+{
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 }
 
 void FilterComponent::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-    filterType.setBounds(0, 0, 90, 20);
-    cutoffSlider.setBounds(50, 50, 100, 10);
-    resonanceSlider.setBounds(200, 50, 100, 10);
+    const auto bounds = getLocalBounds();
+    const auto paddingX = bounds.getWidth() / 20;
+    const auto paddingY = bounds.getHeight() / 20;
+    const auto textPadding = bounds.getHeight() / 10;
+    const auto comboboxWidth = bounds.getWidth() / 2 - paddingX * 2;
+    const auto comboboxHeight = bounds.getHeight() / 3 - paddingY * 2;
+    const auto sliderWidth = bounds.getWidth() - paddingX * 2;
+    const auto sliderHeight = bounds.getHeight() / 3.5 - paddingY * 2;
+
+
+    filterType.setBounds(paddingX, paddingY, comboboxWidth, comboboxHeight);
+    cutoffSlider.setBounds(paddingX, filterType.getBottom() + paddingY + textPadding, sliderWidth, sliderHeight);
+    resonanceSlider.setBounds(paddingX, cutoffSlider.getBottom() + paddingY + textPadding, sliderWidth, sliderHeight);
 }

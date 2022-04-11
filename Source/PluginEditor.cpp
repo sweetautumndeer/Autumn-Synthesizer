@@ -11,21 +11,28 @@
 
 //==============================================================================
 Music167AudioProcessorEditor::Music167AudioProcessorEditor (Music167AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), adsr (audioProcessor.apvts), osc (audioProcessor.apvts, "OSC1WAVETYPE"), filter (audioProcessor.apvts, "FILTER1") {
+    : AudioProcessorEditor (&p), audioProcessor (p), adsr (audioProcessor.apvts), osc1 (audioProcessor.apvts, "OSC1"), osc2(audioProcessor.apvts, "OSC2"), 
+    osc3(audioProcessor.apvts, "OSC3"), filter (audioProcessor.apvts, "MASTERFILTER")
+{
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (800, 600);
 
     addAndMakeVisible(adsr);
-    addAndMakeVisible(osc);
+    addAndMakeVisible(osc1);
+    addAndMakeVisible(osc2);
+    addAndMakeVisible(osc3);
     addAndMakeVisible(filter);
 }
 
-Music167AudioProcessorEditor::~Music167AudioProcessorEditor() {
+Music167AudioProcessorEditor::~Music167AudioProcessorEditor() 
+{
+
 }
 
 //==============================================================================
-void Music167AudioProcessorEditor::paint (juce::Graphics& g) {
+void Music167AudioProcessorEditor::paint (juce::Graphics& g) 
+{
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
@@ -34,10 +41,20 @@ void Music167AudioProcessorEditor::paint (juce::Graphics& g) {
     g.drawFittedText("Autumn's Synthesizer", getLocalBounds(), juce::Justification::centredTop, 1);
 }
 
-void Music167AudioProcessorEditor::resized() {
-    adsr.setBounds(getLocalBounds());
-    osc.setBounds(10, 10, 100, 30);
-    filter.setBounds(10, 125, 350, 100);
+void Music167AudioProcessorEditor::resized() 
+{
+    const auto bounds = getLocalBounds(); // get plugin bounds
+    const auto padding = bounds.getWidth() / 80;
+    const auto oscStartY = bounds.getHeight() / 24;
+    const auto widthThirds = (bounds.getWidth() - padding * 4) / 3;
+    const auto widthHalf = (bounds.getWidth() - padding * 3) / 2;
+    const auto heightThirds = (bounds.getHeight() - padding * 4) / 3;
+
+    osc1.setBounds(padding, oscStartY, widthThirds, heightThirds);
+    osc2.setBounds(osc1.getRight() + padding, oscStartY, widthThirds, heightThirds);
+    osc3.setBounds(osc2.getRight() + padding, oscStartY, widthThirds, heightThirds);
+    adsr.setBounds(padding, osc1.getBottom() + padding, widthHalf, heightThirds);
+    filter.setBounds(adsr.getRight() + padding, osc1.getBottom() + padding, widthHalf, heightThirds);
 }
 
 
