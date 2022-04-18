@@ -33,9 +33,9 @@ private:
 
     // GUI Elements
     AdsrComponent adsr;
+    OscComponent osc0;
     OscComponent osc1;
     OscComponent osc2;
-    OscComponent osc3;
     FilterComponent filter;
 
     // GUI Dimensions

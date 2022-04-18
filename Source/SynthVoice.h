@@ -26,10 +26,10 @@ public:
     void updateADSR(const float attack, const float decay, const float sustain, const float release);
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     virtual void renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
-    OscData& getOscillator() { return osc; };
+    OscData& getOscillator(int num);
 
 private:
-    OscData osc;
+    OscData osc0, osc1, osc2;
     juce::dsp::Gain<float> gain; // Output Volume
     AdsrData adsr;
 

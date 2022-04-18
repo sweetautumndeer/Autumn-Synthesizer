@@ -166,8 +166,12 @@ void Music167AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (int i = 0; i < synth.getNumVoices(); ++i) {
         if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i))) {
             // Osc controls
-            auto& oscWave = *apvts.getRawParameterValue("OSC1WAVETYPE");
-            voice->getOscillator().setWaveType(oscWave);
+            auto& oscWave0 = *apvts.getRawParameterValue("OSC0WAVETYPE");
+            //auto& oscWave1 = *apvts.getRawParameterValue("OSC1WAVETYPE");
+            //auto& oscWave2 = *apvts.getRawParameterValue("OSC2WAVETYPE");
+            voice->getOscillator(0).setWaveType(oscWave0);
+            //voice->getOscillator(1).setWaveType(oscWave1);
+            //voice->getOscillator(2).setWaveType(oscWave2);
 
             // ADSR
             auto& attack = *apvts.getRawParameterValue("ATTACK");
@@ -205,19 +209,13 @@ juce::AudioProcessorEditor* Music167AudioProcessor::createEditor()
 //==============================================================================
 void Music167AudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
     auto state = apvts.copyState();
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
-
 }
 
 void Music167AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
     std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 
     if (xmlState.get() != nullptr)
@@ -232,22 +230,34 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new Music167AudioProcessor();
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout Music167AudioProcessor::createParams() {
-    // OSC wave selection
+juce::AudioProcessorValueTreeState::ParameterLayout Music167AudioProcessor::createParams() 
+{
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
+    // Osc 0 + Filter
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC0WAVETYPE", "Osc 0 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC0FILTERTYPE", "Osc 0 Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("OSC0FILTERCUTOFF", "Osc 0 Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("OSC0FILTERRESONANCE", "Osc 0 Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));
+    // Osc 1 + Filter
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC1WAVETYPE", "Osc 1 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC1FILTERTYPE", "Osc 1 Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("OSC1FILTERCUTOFF", "Osc 1 Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("OSC1FILTERRESONANCE", "Osc 1 Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));
+    // Osc 2 + Filter
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC2WAVETYPE", "Osc 2 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC2FILTERTYPE", "Osc 2 Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("OSC2FILTERCUTOFF", "Osc 2 Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("OSC2FILTERRESONANCE", "Osc 2 Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));
 
     // ADSR parameters
     params.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", juce::NormalisableRange<float>{ 0.01f, 1.0f, 0.01f }, 0.01f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", juce::NormalisableRange<float>{ 0.1f, 1.0f, 0.01f }, 0.1f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", juce::NormalisableRange<float>{ 0.0f, 1.0f, 0.01f }, 1.0f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", juce::NormalisableRange<float>{ 0.0f, 3.0f, 0.01f }, 0.4f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("MASTERGAIN", "Master Gain", juce::NormalisableRange<float>{ -80.0f, 20.0f, 0.01f }, 0.0f));
 
-    // Osc wave selection
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC1WAVETYPE", "Osc 1 Wave Type", juce::StringArray { "Sine", "Triangle", "Saw", "Square" }, 0));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC2WAVETYPE", "Osc 2 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC3WAVETYPE", "Osc 3 Wave Type", juce::StringArray{ "Sine", "Triangle", "Saw", "Square" }, 0));
-
-    // Filter parameters
+    // Master Filter parameters
     params.push_back(std::make_unique<juce::AudioParameterChoice>("MASTERFILTERTYPE", "Filter Type", juce::StringArray{ "Low Pass", "Band Pass", "High Pass" }, 0));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("MASTERFILTERCUTOFF", "Filter Cutoff", juce::NormalisableRange<float>{ 20.0f, 20000.0f, 0.1f, }, 200.0f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("MASTERFILTERRESONANCE", "Filter Resonance", juce::NormalisableRange<float>{ 1.0f, 10.0f, 0.1f }, 1.0f));

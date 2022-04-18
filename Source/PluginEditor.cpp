@@ -11,17 +11,17 @@
 
 //==============================================================================
 Music167AudioProcessorEditor::Music167AudioProcessorEditor (Music167AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), adsr (audioProcessor.apvts), osc1 (audioProcessor.apvts, "OSC1"), osc2(audioProcessor.apvts, "OSC2"), 
-    osc3(audioProcessor.apvts, "OSC3"), filter (audioProcessor.apvts, "MASTERFILTER")
+    : AudioProcessorEditor (&p), audioProcessor (p), adsr (audioProcessor.apvts), osc0 (audioProcessor.apvts, "OSC0"), osc1 (audioProcessor.apvts, "OSC1"), 
+    osc2 (audioProcessor.apvts, "OSC2"), filter (audioProcessor.apvts, "MASTERFILTER")
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (800, 600);
 
     addAndMakeVisible(adsr);
+    addAndMakeVisible(osc0);
     addAndMakeVisible(osc1);
     addAndMakeVisible(osc2);
-    addAndMakeVisible(osc3);
     addAndMakeVisible(filter);
 }
 
@@ -50,11 +50,11 @@ void Music167AudioProcessorEditor::resized()
     const auto widthHalf = (bounds.getWidth() - padding * 3) / 2;
     const auto heightThirds = (bounds.getHeight() - padding * 4) / 3;
 
-    osc1.setBounds(padding, oscStartY, widthThirds, heightThirds);
+    osc0.setBounds(padding, oscStartY, widthThirds, heightThirds);
+    osc1.setBounds(osc0.getRight() + padding, oscStartY, widthThirds, heightThirds);
     osc2.setBounds(osc1.getRight() + padding, oscStartY, widthThirds, heightThirds);
-    osc3.setBounds(osc2.getRight() + padding, oscStartY, widthThirds, heightThirds);
-    adsr.setBounds(padding, osc1.getBottom() + padding, widthHalf, heightThirds);
-    filter.setBounds(adsr.getRight() + padding, osc1.getBottom() + padding, widthHalf, heightThirds);
+    adsr.setBounds(padding, osc0.getBottom() + padding, widthHalf, heightThirds);
+    filter.setBounds(adsr.getRight() + padding, osc0.getBottom() + padding, widthHalf, heightThirds);
 }
 
 

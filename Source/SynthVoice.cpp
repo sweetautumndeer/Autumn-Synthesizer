@@ -11,29 +11,37 @@
 #include "SynthVoice.h"
 #include "SynthSound.h"
 
-bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound) {
+bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound) 
+{
     return dynamic_cast<juce::SynthesiserSound*>(sound) != nullptr;
 }
 
-void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) {
-    osc.setWaveFrequency(midiNoteNumber);
+void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) 
+{
+    osc0.setWaveFrequency(midiNoteNumber);
+    osc1.setWaveFrequency(midiNoteNumber);
+    osc2.setWaveFrequency(midiNoteNumber);
     adsr.noteOn();
 }
 
-void SynthVoice::stopNote(float velocity, bool allowTailOff) {
+void SynthVoice::stopNote(float velocity, bool allowTailOff) 
+{
     adsr.noteOff();
     
     if (!allowTailOff || !adsr.isActive())
         clearCurrentNote();
 }
 
-void SynthVoice::pitchWheelMoved(int newPitchWheelValue) {
+void SynthVoice::pitchWheelMoved(int newPitchWheelValue) 
+{
 }
 
-void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue) {
+void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue) 
+{
 }
 
-void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels) {
+void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels) 
+{
     adsr.setSampleRate(sampleRate);
     
     juce::dsp::ProcessSpec spec;
@@ -41,7 +49,9 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     spec.sampleRate = sampleRate;
     spec.numChannels = outputChannels;
 
-    osc.prepareToPlay(spec);
+    osc0.prepareToPlay(spec);
+    osc1.prepareToPlay(spec);
+    osc2.prepareToPlay(spec);
     gain.prepare(spec);
 
     gain.setGainLinear(0.3f);
@@ -49,11 +59,13 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
     isPrepared = true;
 }
 
-void SynthVoice::updateADSR(const float attack, const float decay, const float sustain, const float release) {
+void SynthVoice::updateADSR(const float attack, const float decay, const float sustain, const float release) 
+{
     adsr.updateADSR(attack, decay, sustain, release);
 }
 
-void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) {
+void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) 
+{
     // Check if voice has prepared to play and is not silent, otherwise 
     jassert(isPrepared);
     if (!isVoiceActive())
@@ -65,14 +77,30 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
 
     // Apply information to temp buffer
     juce::dsp::AudioBlock<float> audioBlock { synthBuffer };
-    osc.getNextAudioBlock(audioBlock);
+    osc0.getNextAudioBlock(audioBlock);
     gain.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
     adsr.applyEnvelopeToBuffer(synthBuffer, 0, synthBuffer.getNumSamples());
 
     // Add to output channel by channel
-    for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel) {
+    for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel) 
+    {
         outputBuffer.addFrom(channel, startSample, synthBuffer, channel, 0, numSamples);
         if (!adsr.isActive())
             clearCurrentNote();
+    }
+}
+
+OscData& SynthVoice::getOscillator(int num)
+{
+    switch (num)
+    {
+    case 0:
+        return osc0;
+    case 1:
+        return osc1;
+    case 2:
+        return osc2;
+    default:
+        jassertfalse;
     }
 }
